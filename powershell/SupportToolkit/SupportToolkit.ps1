@@ -1,6 +1,6 @@
 # ==========================================================
 # SupportToolkit.ps1 — launcher
-# v0.2 — структура проекта
+# v0.3 — расширенная диагностика
 # ==========================================================
 
 Set-StrictMode -Version Latest
@@ -12,7 +12,10 @@ $srcFiles = @(
     'Core.ps1'
     'Report.ps1'
     'System.ps1'
+    'Disk.ps1'
     'Network.ps1'
+    'Dns.ps1'
+    'Services.ps1'
     'Menu.ps1'
 )
 
