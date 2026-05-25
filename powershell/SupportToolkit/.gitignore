@@ -1,5 +1,7 @@
-reports/
-*.log
+# Содержимое каталога reports/ (отчёты и логи сессий)
+reports/*
+!reports/.gitkeep
+
 *.tmp
 *.bak
 .env
