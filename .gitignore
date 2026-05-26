@@ -5,3 +5,5 @@ reports/*
 *.tmp
 *.bak
 .env
+
+reports/*.log
