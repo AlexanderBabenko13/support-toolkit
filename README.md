@@ -2,7 +2,7 @@
 
 PowerShell-утилита для L2 поддержки.
 
-**Версия:** 0.3 (расширенная диагностика)
+**Версия:** 0.4 (network extended)
 
 ## Цель проекта
 
@@ -57,7 +57,7 @@ SupportToolkit/
   .gitignore
 ```
 
-## Меню (v0.3)
+## Меню (v0.4)
 
 ### Система
 
@@ -75,6 +75,10 @@ SupportToolkit/
 | 4 | DNS информация (серверы, suffix search list) |
 | 5 | Проверка DNS-имени (A / AAAA / CNAME) |
 | 6 | Проверка адреса или порта (ping / TCP) |
+| 10 | Маршруты IPv4 (DestinationPrefix, NextHop, InterfaceAlias, RouteMetric) |
+| 11 | Внешний IP (api.ipify.org) |
+| 12 | Прокси (WinHTTP + Internet Settings, только чтение) |
+| 13 | Проверка типовых адресов (TCP 443) |
 
 ### Отчёт
 
@@ -93,7 +97,16 @@ SupportToolkit/
 | `Test-DnsResolution` | Разрешение имени пользователем | `Resolve-DnsName` |
 | `Get-ServiceHealth` | Spooler, Dnscache, LanmanWorkstation, LanmanServer, Winmgmt, EventLog | `Get-Service` (без запуска/остановки) |
 
-DNS-кэш **не** очищается. Службы **не** перезапускаются.
+## Диагностики v0.4 (network extended)
+
+| Функция | Описание | Команды |
+|---------|----------|---------|
+| `Get-RouteInfo` | Активные IPv4-маршруты | `Get-NetRoute` (только чтение) |
+| `Get-ExternalIpInfo` | Внешний IP через публичный API | `Invoke-RestMethod` → api.ipify.org |
+| `Get-ProxyInfo` | WinHTTP и пользовательский прокси | `netsh winhttp show proxy`, `Get-ItemProperty` HKCU (только чтение) |
+| `Test-CommonEndpoints` | Быстрая проверка ya.ru, google.com, github.com, microsoft.com:443 | `Test-NetConnection` (фиксированный список из 4 адресов) |
+
+DNS-кэш **не** очищается. Службы **не** перезапускаются. Сетевые настройки и реестр **не** изменяются.
 
 ## Сессионный отчёт
 

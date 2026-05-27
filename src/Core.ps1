@@ -1,6 +1,6 @@
 # Core.ps1 — версия, пути, инициализация, общие утилиты
 
-$Script:ToolkitVersion = '0.3'
+$Script:ToolkitVersion = '0.4'
 $Script:ReportsPath = Join-Path $Script:ToolkitRoot 'reports'
 
 function Initialize-Toolkit {

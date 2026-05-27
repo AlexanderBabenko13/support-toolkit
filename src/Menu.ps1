@@ -18,6 +18,10 @@ function Show-Menu {
         Write-Host '4. DNS информация'
         Write-Host '5. Проверка DNS-имени'
         Write-Host '6. Проверка адреса или порта'
+        Write-Host '10. Маршруты'
+        Write-Host '11. Внешний IP'
+        Write-Host '12. Прокси'
+        Write-Host '13. Проверка типовых адресов'
         Write-Host ''
         Write-Host '--- Отчёт ---'
         Write-Host '8. Экспорт отчёта сессии в TXT'
@@ -51,6 +55,22 @@ function Show-Menu {
             '6' {
                 Write-ToolkitLog 'Меню: пункт 6 — проверка адреса или порта'
                 Test-NetworkTarget
+            }
+            '10' {
+                Write-ToolkitLog 'Меню: пункт 10 — маршруты'
+                Get-RouteInfo
+            }
+            '11' {
+                Write-ToolkitLog 'Меню: пункт 11 — внешний IP'
+                Get-ExternalIpInfo
+            }
+            '12' {
+                Write-ToolkitLog 'Меню: пункт 12 — прокси'
+                Get-ProxyInfo
+            }
+            '13' {
+                Write-ToolkitLog 'Меню: пункт 13 — проверка типовых адресов'
+                Test-CommonEndpoints
             }
             '7' {
                 Write-ToolkitLog 'Меню: пункт 7 — критичные службы'
