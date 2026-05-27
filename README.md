@@ -2,7 +2,7 @@
 
 PowerShell-утилита для L2 поддержки.
 
-**Версия:** 0.3 (расширенная диагностика)
+**Версия:** 0.5 (reporting)
 
 ## Цель проекта
 
@@ -57,7 +57,7 @@ SupportToolkit/
   .gitignore
 ```
 
-## Меню (v0.3)
+## Меню (v0.5)
 
 ### Система
 
@@ -75,6 +75,14 @@ SupportToolkit/
 | 4 | DNS информация (серверы, suffix search list) |
 | 5 | Проверка DNS-имени (A / AAAA / CNAME) |
 | 6 | Проверка адреса или порта (ping / TCP) |
+
+### Отчётность
+
+| Пункт | Действие |
+|-------|----------|
+| 10 | Последние ошибки Event Log (System/Application, Level 2/3, максимум 20 на журнал) |
+| 11 | Экспорт отчёта в HTML |
+| 12 | Быстрый отчёт (без ввода, без долгих проверок) |
 
 ### Отчёт
 
@@ -94,6 +102,16 @@ SupportToolkit/
 | `Get-ServiceHealth` | Spooler, Dnscache, LanmanWorkstation, LanmanServer, Winmgmt, EventLog | `Get-Service` (без запуска/остановки) |
 
 DNS-кэш **не** очищается. Службы **не** перезапускаются.
+
+## Диагностики v0.5 (reporting)
+
+| Функция | Описание | Команды |
+|---------|----------|---------|
+| `Get-RecentEventErrors` | Последние ошибки/предупреждения из System и Application | `Get-WinEvent` (только чтение) |
+| `Export-HtmlReport` | Экспорт текущего сессионного отчёта в HTML | `Out-File` (без внешних CSS/JS) |
+| `Invoke-QuickReport` | Быстрый сбор отчёта без вопросов пользователю | вызов диагностик без `Wait-Enter` |
+
+HTML-отчёты: `reports/SupportToolkit_Report_YYYYMMDD_HHmmss.html`
 
 ## Сессионный отчёт
 

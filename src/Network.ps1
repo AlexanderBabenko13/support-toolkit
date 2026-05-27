@@ -1,6 +1,10 @@
 # Network.ps1 — диагностика сети
 
 function Get-NetworkInfo {
+    param(
+        [switch]$NoPause
+    )
+
     Write-ToolkitLog 'Диагностика: информация о сети — начало'
 
     Add-ReportLine ''
@@ -27,7 +31,9 @@ function Get-NetworkInfo {
         Write-ToolkitLog "Диагностика: информация о сети — ошибка: $($_.Exception.Message)"
     }
 
-    Wait-Enter
+    if (-not $NoPause) {
+        Wait-Enter
+    }
 }
 
 function Test-NetworkTarget {
@@ -78,4 +84,39 @@ function Test-NetworkTarget {
     }
 
     Wait-Enter
+}
+
+function Get-ExternalIpInfo {
+    param(
+        [switch]$NoPause
+    )
+
+    Write-ToolkitLog 'Диагностика: внешний IP — начало'
+
+    Add-ReportLine ''
+    Add-ReportLine '===== EXTERNAL IP ====='
+
+    try {
+        $response = Invoke-RestMethod -Uri 'https://api.ipify.org?format=json' -TimeoutSec 15 -ErrorAction Stop
+        $externalIp = $response.ip
+
+        if ([string]::IsNullOrWhiteSpace($externalIp)) {
+            Add-ReportLine 'Внешний IP не получен: пустой ответ сервиса.'
+            Write-ToolkitLog 'Диагностика: внешний IP — пустой ответ'
+        }
+        else {
+            Add-ReportLine "Внешний IP : $externalIp"
+            Write-ToolkitLog "Диагностика: внешний IP — $externalIp"
+        }
+    }
+    catch {
+        Add-ReportLine 'Не удалось определить внешний IP.'
+        Add-ReportLine 'Возможные причины: нет доступа в интернет, блокировка исходящего HTTPS или недоступен сервис api.ipify.org.'
+        Add-ReportLine "Ошибка     : $($_.Exception.Message)"
+        Write-ToolkitLog "Диагностика: внешний IP — ошибка: $($_.Exception.Message)"
+    }
+
+    if (-not $NoPause) {
+        Wait-Enter
+    }
 }

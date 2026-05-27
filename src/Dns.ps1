@@ -1,6 +1,10 @@
 # Dns.ps1 — диагностика DNS (read-only, без очистки кэша)
 
 function Get-DnsInfo {
+    param(
+        [switch]$NoPause
+    )
+
     Write-ToolkitLog 'Диагностика: DNS информация — начало'
 
     Add-ReportLine ''
@@ -46,7 +50,9 @@ function Get-DnsInfo {
         Write-ToolkitLog "Диагностика: DNS информация — ошибка: $($_.Exception.Message)"
     }
 
-    Wait-Enter
+    if (-not $NoPause) {
+        Wait-Enter
+    }
 }
 
 function Test-DnsResolution {

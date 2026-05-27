@@ -1,6 +1,10 @@
 # Services.ps1 — статус критичных служб (read-only)
 
 function Get-ServiceHealth {
+    param(
+        [switch]$NoPause
+    )
+
     Write-ToolkitLog 'Диагностика: критичные службы — начало'
 
     Add-ReportLine ''
@@ -34,5 +38,7 @@ function Get-ServiceHealth {
         Write-ToolkitLog "Диагностика: критичные службы — ошибка: $($_.Exception.Message)"
     }
 
-    Wait-Enter
+    if (-not $NoPause) {
+        Wait-Enter
+    }
 }

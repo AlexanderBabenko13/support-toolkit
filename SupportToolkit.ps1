@@ -1,7 +1,11 @@
 # ==========================================================
 # SupportToolkit.ps1 — launcher
-# v0.3 — расширенная диагностика
+# v0.5 — reporting
 # ==========================================================
+
+param(
+    [switch]$QuickReport
+)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Continue'
@@ -32,4 +36,10 @@ foreach ($file in $srcFiles) {
 Initialize-Toolkit
 Write-ToolkitLog "Запуск SupportToolkit v$($Script:ToolkitVersion) (PS $($PSVersionTable.PSVersion))"
 
-Show-Menu
+if ($QuickReport) {
+    Write-ToolkitLog 'Параметр запуска: -QuickReport'
+    Invoke-QuickReport
+}
+else {
+    Show-Menu
+}

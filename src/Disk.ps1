@@ -1,6 +1,10 @@
 # Disk.ps1 — диагностика локальных дисков (read-only)
 
 function Get-DiskInfo {
+    param(
+        [switch]$NoPause
+    )
+
     Write-ToolkitLog 'Диагностика: диски — начало'
 
     Add-ReportLine ''
@@ -12,7 +16,9 @@ function Get-DiskInfo {
         if (-not $disks) {
             Add-ReportLine 'Локальные диски не найдены.'
             Write-ToolkitLog 'Диагностика: диски — диски не найдены'
-            Wait-Enter
+            if (-not $NoPause) {
+                Wait-Enter
+            }
             return
         }
 
@@ -43,5 +49,7 @@ function Get-DiskInfo {
         Write-ToolkitLog "Диагностика: диски — ошибка: $($_.Exception.Message)"
     }
 
-    Wait-Enter
+    if (-not $NoPause) {
+        Wait-Enter
+    }
 }
