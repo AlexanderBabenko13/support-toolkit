@@ -2,7 +2,7 @@
 
 PowerShell-утилита для L2 поддержки.
 
-**Версия:** 0.5 (reporting)
+**Версия:** 0.6 (local config)
 
 ## Цель проекта
 
@@ -57,7 +57,7 @@ SupportToolkit/
   .gitignore
 ```
 
-## Меню (v0.5)
+## Меню (v0.6)
 
 ### Система
 
@@ -83,6 +83,7 @@ SupportToolkit/
 | 10 | Последние ошибки Event Log (System/Application, Level 2/3, максимум 20 на журнал) |
 | 11 | Экспорт отчёта в HTML |
 | 12 | Быстрый отчёт (без ввода, без долгих проверок) |
+| 13 | Проверка адресов из локального конфига |
 
 ### Отчёт
 
@@ -103,15 +104,43 @@ SupportToolkit/
 
 DNS-кэш **не** очищается. Службы **не** перезапускаются.
 
-## Диагностики v0.5 (reporting)
+## Диагностики v0.6 (local config)
 
 | Функция | Описание | Команды |
 |---------|----------|---------|
 | `Get-RecentEventErrors` | Последние ошибки/предупреждения из System и Application | `Get-WinEvent` (только чтение) |
 | `Export-HtmlReport` | Экспорт текущего сессионного отчёта в HTML | `Out-File` (без внешних CSS/JS) |
 | `Invoke-QuickReport` | Быстрый сбор отчёта без вопросов пользователю | вызов диагностик без `Wait-Enter` |
+| `Test-ConfiguredEndpoints` | Проверка endpoint-ов из `config/endpoints.local.json` | `Test-NetConnection` (только чтение) |
+| `Import-ToolkitEndpoints` | Импорт и валидация endpoint-ов из `config/endpoints.local.json` | `Get-Content` + `ConvertFrom-Json` |
 
 HTML-отчёты: `reports/SupportToolkit_Report_YYYYMMDD_HHmmss.html`
+
+## Локальный конфиг endpoint-ов (v0.6)
+
+Для быстрой проверки адресов инженером поддержки используйте локальный файл:
+
+- `config/endpoints.local.json`
+
+Файл **не попадает в GitHub** (добавлен в `.gitignore`) и **не создаётся автоматически**.
+
+### Пример структуры
+
+Создай `config/endpoints.local.json` по примеру `config/endpoints.example.json`, например:
+
+```json
+{
+  "Endpoints": [
+    {
+      "Name": "Example HTTPS",
+      "Host": "example.com",
+      "Port": 443
+    }
+  ]
+}
+```
+
+Поле `Endpoints` — массив объектов. Для каждого объекта нужны поля `Name`, `Host`, `Port`.
 
 ## Сессионный отчёт
 

@@ -23,6 +23,7 @@ function Show-Menu {
         Write-Host '10. Последние ошибки Event Log'
         Write-Host '11. Экспорт отчёта в HTML'
         Write-Host '12. Быстрый отчёт'
+        Write-Host '13. Проверка адресов из локального конфига'
         Write-Host ''
         Write-Host '--- Отчёт ---'
         Write-Host '8. Экспорт отчёта сессии в TXT'
@@ -72,6 +73,10 @@ function Show-Menu {
             '12' {
                 Write-ToolkitLog 'Меню: пункт 12 — быстрый отчёт'
                 Invoke-QuickReport
+            }
+            '13' {
+                Write-ToolkitLog 'Меню: пункт 13 — проверка адресов из локального конфига'
+                Test-ConfiguredEndpoints
             }
             '8' {
                 Write-ToolkitLog 'Меню: пункт 8 — экспорт отчёта'
