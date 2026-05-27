@@ -19,6 +19,11 @@ function Show-Menu {
         Write-Host '5. Проверка DNS-имени'
         Write-Host '6. Проверка адреса или порта'
         Write-Host ''
+        Write-Host '--- Отчётность ---'
+        Write-Host '10. Последние ошибки Event Log'
+        Write-Host '11. Экспорт отчёта в HTML'
+        Write-Host '12. Быстрый отчёт'
+        Write-Host ''
         Write-Host '--- Отчёт ---'
         Write-Host '8. Экспорт отчёта сессии в TXT'
         Write-Host '9. Очистить буфер отчёта'
@@ -55,6 +60,18 @@ function Show-Menu {
             '7' {
                 Write-ToolkitLog 'Меню: пункт 7 — критичные службы'
                 Get-ServiceHealth
+            }
+            '10' {
+                Write-ToolkitLog 'Меню: пункт 10 — последние ошибки Event Log'
+                Get-RecentEventErrors
+            }
+            '11' {
+                Write-ToolkitLog 'Меню: пункт 11 — экспорт отчёта в HTML'
+                Export-HtmlReport
+            }
+            '12' {
+                Write-ToolkitLog 'Меню: пункт 12 — быстрый отчёт'
+                Invoke-QuickReport
             }
             '8' {
                 Write-ToolkitLog 'Меню: пункт 8 — экспорт отчёта'
