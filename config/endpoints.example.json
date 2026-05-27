@@ -1,0 +1,15 @@
+{
+  "Endpoints": [
+    {
+      "Name": "Example HTTPS",
+      "Host": "example.com",
+      "Port": 443
+    },
+    {
+      "Name": "Example DNS",
+      "Host": "ya.ru",
+      "Port": 443
+    }
+  ]
+}
+

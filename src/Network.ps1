@@ -120,3 +120,138 @@ function Get-ExternalIpInfo {
         Wait-Enter
     }
 }
+
+function Import-ToolkitEndpoints {
+    Write-ToolkitLog 'Импорт локальных эндпоинтов — начало'
+
+    $configPath = Join-Path $Script:ToolkitRoot 'config' 'endpoints.local.json'
+    Add-ReportLine ''
+    Add-ReportLine '===== ЛОКАЛЬНЫЕ КОНФИГУРИРОВАННЫЕ ЭНДПОИНТЫ ====='
+    Add-ReportLine "Файл конфигурации: $configPath"
+
+    if (-not (Test-Path -LiteralPath $configPath)) {
+        $msg = 'Файл config/endpoints.local.json не найден. Создай его по примеру из config/endpoints.example.json.'
+        Add-ReportLine $msg
+        Write-ToolkitLog 'Импорт локальных эндпоинтов: файл не найден'
+        return $null
+    }
+
+    try {
+        $raw = Get-Content -LiteralPath $configPath -Raw -ErrorAction Stop
+        $data = $raw | ConvertFrom-Json -ErrorAction Stop
+
+        if ($null -eq $data.Endpoints) {
+            throw "В JSON не найдено поле 'Endpoints'."
+        }
+
+        $validated = @()
+        $index = 0
+        foreach ($ep in @($data.Endpoints)) {
+            $index++
+
+            $name = $ep.Name
+            $host = $ep.Host
+            $port = $ep.Port
+
+            $missing = @()
+            if ([string]::IsNullOrWhiteSpace($name)) { $missing += 'Name' }
+            if ([string]::IsNullOrWhiteSpace($host)) { $missing += 'Host' }
+
+            $portInt = $null
+            if ($null -eq $port -or [string]::IsNullOrWhiteSpace([string]$port)) {
+                $missing += 'Port'
+            }
+            else {
+                try {
+                    $portInt = [int]$port
+                }
+                catch {
+                    $missing += 'Port (не число)'
+                }
+            }
+
+            if ($missing.Count -gt 0) {
+                $AddMsg = "Эндпоинт #${index} пропущены/некорректны поля: $($missing -join ', ')"
+                Add-ReportLine $AddMsg
+                Write-ToolkitLog "Импорт локальных эндпоинтов: невалидный эндпоинт #${index} ($($missing -join ', '))"
+                continue
+            }
+
+            if ($portInt -lt 1 -or $portInt -gt 65535) {
+                Add-ReportLine "Эндпоинт #${index}: Port вне диапазона (1..65535): $portInt"
+                Write-ToolkitLog "Импорт локальных эндпоинтов: невалидный Port у эндпоинта #${index} ($portInt)"
+                continue
+            }
+
+            $validated += [pscustomobject]@{
+                Name = $name
+                Host = $host
+                Port = $portInt
+            }
+        }
+
+        if ($validated.Count -eq 0) {
+            Add-ReportLine 'В конфиге нет валидных эндпоинтов для проверки.'
+            Write-ToolkitLog 'Импорт локальных эндпоинтов: нет валидных объектов'
+            return $null
+        }
+
+        Add-ReportLine "Валидных эндпоинтов для проверки: $($validated.Count)"
+        Write-ToolkitLog "Импорт локальных эндпоинтов: готово ($($validated.Count))"
+        return $validated
+    }
+    catch {
+        $err = "Ошибка чтения/валидации JSON config/endpoints.local.json: $($_.Exception.Message)"
+        Add-ReportLine $err
+        Write-ToolkitLog "Импорт локальных эндпоинтов: ошибка — $($_.Exception.Message)"
+        return $null
+    }
+}
+
+function Test-ConfiguredEndpoints {
+    Write-ToolkitLog 'Диагностика: проверки эндпоинтов из локального конфига — начало'
+
+    Add-ReportLine ''
+    Add-ReportLine '===== ПРОВЕРКА ЛОКАЛЬНО КОНФИГУРИРОВАННЫХ ЭНДПОИНТОВ ====='
+
+    try {
+        $endpoints = Import-ToolkitEndpoints
+        if ($null -eq $endpoints) {
+            Add-ReportLine 'Проверка адресов из локального конфига отменена (нет валидных эндпоинтов).'
+            Write-ToolkitLog 'Диагностика: эндпоинты из конфига — отменено'
+            Wait-Enter
+            return
+        }
+
+        foreach ($ep in $endpoints) {
+            Add-ReportLine ''
+            Add-ReportLine 'Проверка эндпоинта:'
+            Add-ReportLine "Name              : $($ep.Name)"
+            Add-ReportLine "Host              : $($ep.Host)"
+            Add-ReportLine "Port              : $($ep.Port)"
+
+            try {
+                $result = Test-NetConnection -ComputerName $ep.Host -Port $ep.Port -ErrorAction Stop
+                $tcpOk = $result.TcpTestSucceeded
+
+                Add-ReportLine "TcpTestSucceeded : $tcpOk"
+                Write-ToolkitLog "Проверка эндпоинта: $($ep.Name) TcpTestSucceeded=$tcpOk"
+            }
+            catch {
+                Add-ReportLine "TcpTestSucceeded : False"
+                Add-ReportLine "Ошибка            : $($_.Exception.Message)"
+                Write-ToolkitLog "Проверка эндпоинта ERROR: $($ep.Name) — $($_.Exception.Message)"
+            }
+        }
+
+        Add-ReportLine ''
+        Add-ReportLine 'Проверка адресов из локального конфига завершена.'
+        Write-ToolkitLog 'Диагностика: проверки эндпоинтов из локального конфига — завершено'
+    }
+    catch {
+        Add-ReportLine "Ошибка проверки эндпоинтов из локального конфига: $($_.Exception.Message)"
+        Write-ToolkitLog "Диагностика: эндпоинты из конфига — ошибка: $($_.Exception.Message)"
+    }
+
+    Wait-Enter
+}
